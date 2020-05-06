@@ -12,14 +12,14 @@ var UserSchema = mongoose.Schema({
     email: {
         type: String,
         index:true,
-        validate: {
+        /*validate: {
             validator: function(v, cb) {
                 User.find({email: v, _id: { $ne: this._id }}, function(err, docs){
                     cb(docs.length == 0);
                 });
             },
             message: 'Cet email a déjà été pris'
-        }
+        }*/
     },
     createdAt: {
         type: Date,
