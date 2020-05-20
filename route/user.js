@@ -8,7 +8,7 @@ var smtpInfo = {
     user: 'postmaster@sandboxdb2b287c11094e92be0fe0e7bd21f30b.mailgun.org',
     password: '4acbdbe4cee7eed9543d4d72b702fbad-e5e67e3e-bcec1908',
 }
-}
+
 
 
 
