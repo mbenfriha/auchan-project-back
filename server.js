@@ -86,7 +86,7 @@ app.get('/users', passport.authenticate('jwt', { session: false }), User.all);
 app.get('/users/student', passport.authenticate('jwt', { session: false }), User.allStudent);
 app.get('/users/:typeCours', passport.authenticate('jwt', { session: false }), User.recherche);
 
-app.post('/mail', User.mailSend);
+app.post('/mail', passport.authenticate('jwt', { session: false }), User.mailSend);
 
 
 

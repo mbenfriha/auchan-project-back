@@ -2,6 +2,14 @@ var User = require('../model/user');
 var nodemailer = require('nodemailer');
 
 
+var smtpInfo = {
+    host: 'smtp.mailgun.org',
+    port: 587,
+    user: 'postmaster@sandboxdb2b287c11094e92be0fe0e7bd21f30b.mailgun.org',
+    password: '4acbdbe4cee7eed9543d4d72b702fbad-e5e67e3e-bcec1908',
+}
+}
+
 
 
 module.exports.register = function(req, res) {    
@@ -103,31 +111,35 @@ module.exports.recherche = function(req, res){
         }
     });
     
-    //if(rechercheCours && rechercheJours && rechercheHeures)
 }
 
-module.exports.mailSend = function(emailStudent, emailParent){
+module.exports.mailSend = function(req, res){
     var transporter = nodemailer.createTransport({
-        service: 'gmail',
+        host: smtpInfo.host,
+        port: smtpInfo.port,
         auth: {
-          user: 'your_email',
-          pass: 'your_mot_de_passe'
+            user: smtpInfo.user,
+            pass: smtpInfo.password
         }
+
       });
       
       var mailOptions = {
-        from: 'your_email',
-        to: emailStudent,
-        subject: "Aider un parent",
-        text: "Bonjour cher étudiant. Un parent à besoin de votre aide pour les devoirs de ses enfants. Vous pouvez le contacter directement par mail: " + emailParent +
+        from: "benfriha.mohamed@gmail.com", // a changé par : req.body.emailParent
+        to: req.body.emailStudent,
+        subject: "Un parent vous a contacté - Auchan",
+        text: "Bonjour cher étudiant. Un parent a besoin de votre aide pour les devoirs de ses enfants. Vous pouvez le contacter directement par mail: " + req.body.emailParent +
+            "\n"+
+            "Ou vous pouvez directement réponde à ce mail"+
         "Bien à vous"
       };
       
       transporter.sendMail(mailOptions, function(error, info){
         if (error) {
-          console.log(error);
+            res.status(500).send({message: error}).end();
         } else {
           console.log('Email sent: ' + info.response);
+            res.send({message: 'Email sent: ' + info.response}).end();
         }
       });
 }
