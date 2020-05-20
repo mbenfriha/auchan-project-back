@@ -82,6 +82,13 @@ app.get('/logout', function(req, res){
 // get current user
 app.get('/user', passport.authenticate('jwt', { session: false }), User.current);
 
+app.get('/users', passport.authenticate('jwt', { session: false }), User.all);
+app.get('/users/student', passport.authenticate('jwt', { session: false }), User.allStudent);
+app.get('/users/:typeCours', passport.authenticate('jwt', { session: false }), User.recherche);
+
+app.post('/mail', User.mailSend);
+
+
 
 
 /*
