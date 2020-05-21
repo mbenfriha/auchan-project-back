@@ -140,4 +140,6 @@ passport.deserializeUser(function(id, done) {
 });
 
 
+User.initAdmin();
+
 app.listen(port, () => console.log('App listening on port '+port));

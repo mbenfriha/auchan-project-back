@@ -112,36 +112,41 @@ module.exports.createUser = function(newUser, callback){
     });
 }
 module.exports.updateUser = function(updateUser, callback) {
-    console.log(updateUser.user);
     let upd = updateUser.body;
     User.findOne(updateUser.user._id, function(err, user) {
-        if(upd.newEmail) {
-            user.email = upd.newEmail;
-        }
+        console.log(user);
+
         if(upd.password) {
             console.log(upd.password);
             bcrypt.genSalt(10, function(err, salt) {
                 bcrypt.hash(upd.password, salt, function(err, hash) {
                     user.password = hash;
-                    user.save(function(err) {
+                    user.save(function (err) {
                         callback(user, err);
                     });
                 });
             });
-        }
-        if(upd.cours) {
-            user.cours = upd.cours;
-            user.save(function(err) {
+        }else {
+            if (upd.newEmail) {
+                user.email = upd.newEmail;
+            }
+            if (upd.password) {
+                console.log(upd.password);
+                bcrypt.genSalt(10, function (err, salt) {
+                    bcrypt.hash(upd.password, salt, function (err, hash) {
+                        user.password = hash;
+                    });
+                });
+            }
+            if (upd.cours) {
+                user.cours = upd.cours;
+            }
+
+            user.save(function (err) {
                 callback(user, err);
             });
-        }
-        else {
 
-            user.save(function(err) {
-                callback(user, err);
-            });
         }
-
     });
 }
 
@@ -183,7 +188,7 @@ module.exports.getAllStudentByCours = function(name,callback){
 };
 
 module.exports.getAllStudent = function(callback){
-    User.find({role: "etudiant"}).select('-password').sort({createdAt: 'desc'}).exec(callback);
+    User.find({role: "etudiant", active: true}).select('-password').sort({createdAt: 'desc'}).exec(callback);
 
 };
 
@@ -205,6 +210,12 @@ module.exports.count = function(callback) {
         })
     });
 }
+
+module.exports.checkContact = function(mail, callback) {
+    Contact.find({'from': mail.parent, 'to': mail.student}).exec(callback);
+
+}
+
 
 module.exports.contactAdd = function(mail, callback) {
     var contact = new Contact({
