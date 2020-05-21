@@ -82,11 +82,25 @@ app.get('/logout', function(req, res){
 // get current user
 app.get('/user', passport.authenticate('jwt', { session: false }), User.current);
 
+// get all user
 app.get('/users', passport.authenticate('jwt', { session: false }), User.all);
-app.get('/users/student', passport.authenticate('jwt', { session: false }), User.allStudent);
-app.get('/users/:typeCours', passport.authenticate('jwt', { session: false }), User.recherche);
 
+// get all student
+app.get('/users/student', passport.authenticate('jwt', { session: false }), User.allStudent);
+
+// get students by cours
+app.get('/users/:typeCours', passport.authenticate('jwt', { session: false }), User.recherche);User
+
+// send contact mail
 app.post('/mail', passport.authenticate('jwt', { session: false }), User.mailSend);
+
+// update user
+app.post('/update', passport.authenticate('jwt', { session: false }), User.update);
+
+// active user
+app.get('/active/:id', passport.authenticate('jwt', { session: false }), User.setActive);
+
+app.get('/count', passport.authenticate('jwt', { session: false }), User.getCount)
 
 
 

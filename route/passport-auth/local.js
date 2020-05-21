@@ -12,23 +12,33 @@ passport.use(new LocalStrategy({
         passwordField: 'password'
     },
     function(username, password, done) {
-        User.findOne({ email: username }, function(err, user){
+        User.findOne({ email: username }, function(err, user) {
+            console.log(user);
             if(err) {
-                conso
                 res.status(500).send(err).end();
             };
             if(!user){
-                return done(null, false, {message: 'Unknown User'});
+                return done(null, false, {message: 'Cet utilisateur n\'existe pas'});
             }
+            if(!user.active) {
+                console.log('pass');
+                return done(null, false, {message: 'Votre compte n\'est pas encore activé'});
+            }
+
             User.comparePassword(password, user.password, function(err, isMatch){
                 if(err) {
                     res.status(500).send(err).end();
                 };
                 if(isMatch) {
-                    // return done(null, false, {message: 'Your account is not activated'});
-                    return done(null, user);
+
+                    if(!user.active) {
+                        return done(null, false, {message: 'Votre compte n\'est pas encore activé'});
+                    } else {
+                        // return done(null, false, {message: 'Your account is not activated'});
+                        return done(null, user);
+                    }
                 } else {
-                    return done(null, false, {message: 'Invalid password'});
+                    return done(null, false, {message: 'Erreur mot de passe'});
                 }
             });
         });
@@ -42,5 +52,5 @@ module.exports.auth = function(req, res) {
         data: req.user
     }, config.secretOrKey, { expiresIn: '148h' }); // expiry in seconds
 
-    res.send({email:req.user.email, username:req.user.username, role:req.user.role, token:token});
+    res.send({email:req.user.email, role:req.user.role, cours:req.user.cours, token:token, });
 };

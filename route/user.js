@@ -3,10 +3,10 @@ var nodemailer = require('nodemailer');
 
 
 var smtpInfo = {
-    host: 'smtp.mailgun.org',
+    host: '',
     port: 587,
-    user: 'postmaster@sandboxdb2b287c11094e92be0fe0e7bd21f30b.mailgun.org',
-    password: '4acbdbe4cee7eed9543d4d72b702fbad-e5e67e3e-bcec1908',
+    user: '',
+    password: '',
 }
 
 
@@ -38,7 +38,7 @@ module.exports.register = function(req, res) {
                         if (err.name == 'ValidationError') {
                             for (field in err.errors) {
                             }
-                            res.status(500).send(err.message).end();
+                            res.status(500).send({message: err.message}).end();
                         } else {
                             res.status(500).send(err).end();
                         }
@@ -65,7 +65,7 @@ module.exports.current = function(req, res) {
 };
 
 module.exports.all = function(req, res) {
-    if(req.user.role == "parent") {
+    if(req.user.role == "admin") {
 
 
         User.getAll(function(err, user) {
@@ -110,7 +110,17 @@ module.exports.recherche = function(req, res){
             res.status(404).send({message: "Aucun étudiant trouvé"}).end()
         }
     });
-    
+}
+
+module.exports.update = function(req, res){
+    User.updateUser(req, function(user, err) {
+        if(err) {
+            res.status(500).send(err).end();
+        } else {
+            delete user.password;
+            res.send(user).end();
+        }
+    })
 }
 
 module.exports.mailSend = function(req, res){
@@ -138,8 +148,31 @@ module.exports.mailSend = function(req, res){
         if (error) {
             res.status(500).send({message: error}).end();
         } else {
-          console.log('Email sent: ' + info.response);
-            res.send({message: 'Email sent: ' + info.response}).end();
+            User.contactAdd({student: req.body.emailStudent, parent: req.body.emailParent}, function(err, res) {
+                res.send({message: 'Email sent: ' + info.response}).end();
+            })
         }
       });
+}
+
+module.exports.setActive = function(req, res) {
+    User.active(req.params.id, function (err, user) {
+        res.send(user).end();
+    }, err => {
+        res.status(500).send({message: "Une erreur est survenue"}).end()
+    })
+}
+
+module.exports.getCount = function(req, res) {
+
+    if(req.user.role == "admin") {
+
+        User.count(function (err, count) {
+            res.send(count).end();
+        }, err => {
+            res.status(500).send({message: "Une erreur est survenue"}).end()
+        })
+    }else {
+        res.status(401).send({message: "Vous n'êtes pas admin"}).end()
+    }
 }
